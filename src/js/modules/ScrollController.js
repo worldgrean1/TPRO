@@ -291,6 +291,13 @@ class _ScrollController {
     update() {
         Raf.subscribe(() => {
             /* 
+              Safety checks - ensure gl.world and activeScenes exist
+            */
+            if (!this.gl || !this.gl.world || !this.gl.world.activeScenes || !this.gl.world.activeScenes.current) {
+                return
+            }
+
+            /* 
               Nudge
             */
             if (this.gl.world.activeScenes.current.id == 'main-a' || this.gl.world.activeScenes.current.id == 'main-b') {
@@ -322,6 +329,35 @@ class _ScrollController {
                 this.gl.world.renderPlane.mesh.material.uniforms.uScrollVelocity.value = Math.min(this.easedVelocity, this.easedTouchDragVelocity)
             }
         })
+    }
+
+    destroy() {
+        /* 
+          Clear timeouts
+        */
+        if (this.scrollTimeout) {
+            clearTimeout(this.scrollTimeout)
+            this.scrollTimeout = null
+        }
+
+        /* 
+          Remove event listeners
+        */
+        document.removeEventListener('wheel', this.handleTresholdNudge.bind(this))
+
+        /* 
+          Stop scroll
+        */
+        if (Scroll) {
+            Scroll.stop()
+        }
+
+        /* 
+          Reset flags
+        */
+        this.isTransitioning = false
+        this.isIdleScrollAllowed = true
+        this.isBackwardLoopingAllowed = false
     }
 }
 

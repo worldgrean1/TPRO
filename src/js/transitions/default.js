@@ -1,4 +1,4 @@
-﻿import {
+import {
     Pages
 } from '../pages'
 import gsap, {
@@ -63,6 +63,11 @@ export class Transition {
         done
     }) {
         ScrollController.isTransitioning = true
+
+        /* 
+          Always cleanup ScrollController when leaving any page
+        */
+        ScrollController.destroy()
 
         await Pages.transitionOut(from)
         // this.gl.audio.animateAudioOut();
